@@ -14,8 +14,8 @@ $brand-100: rgba(0, 71, 255, 1);
 $brand-80: rgba(0, 71, 255, 0.8);
 $success-100: rgba(22, 191, 39, 1);
 $success-20: rgba(22, 191, 39, 0.2);
-$success-100: rgba(191, 22, 22, 1);
-$success-20: rgba(191, 22, 22, 0.2);
+$error-100: rgba(191, 22, 22, 1);
+$error-20: rgba(191, 22, 22, 0.2);
 
 // Breakpoints
 $screen-sm: 640px;
@@ -68,6 +68,16 @@ $screen-xxl: 1536px;
 	letter-spacing: -0.07em;
 }
 
+@mixin text-xs {
+	font-size: 0.75rem;
+	line-height: 1.8;
+}
+
+@mixin text-sm {
+	font-size: 0.875rem;
+	line-height: 1.8;
+}
+
 @mixin text-base {
 	font-size: 1rem;
 	line-height: 1.8;
@@ -78,13 +88,8 @@ $screen-xxl: 1536px;
 	line-height: 1.8;
 }
 
-@mixin button-sm {
-	font-size: 1.125rem;
-	line-height: 1.8;
-}
-
-@mixin button-base {
-	font-size: 1.25rem;
+@mixin text-xl {
+	font-size: 1.5rem;
 	line-height: 1.8;
 }
 

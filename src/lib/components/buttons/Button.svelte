@@ -20,7 +20,7 @@
 
 <style lang="scss">
 	.button {
-		@include button-base;
+		@include text-xl;
 		display: inline-flex;
 		column-gap: 1rem;
 		justify-content: space-between;

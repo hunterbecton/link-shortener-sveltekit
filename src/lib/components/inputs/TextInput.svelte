@@ -1,20 +1,46 @@
 <script lang="ts">
 	import GlobeIcon from '$lib/components/icons/GlobeIcon.svelte';
 
-	let { withIcon = false, Icon = GlobeIcon, className = '', ...props } = $props();
+	let {
+		name = 'email',
+		withIcon = false,
+		hideLabel = false,
+		Icon = GlobeIcon,
+		className = '',
+		errors = [] as string[],
+		...props
+	} = $props();
 </script>
 
-<div class="container {className}">
-	{#if withIcon}
-		<div class="icon-container">
-			<svelte:component this={Icon} className="field-icon" />
-		</div>
+<div class="input-container {className}">
+	<label for={name} class="label" class:hide-label={!hideLabel}>Email</label>
+	<div class="field-container">
+		{#if withIcon}
+			<div class="icon-container">
+				<svelte:component this={Icon} className="field-icon" />
+			</div>
+		{/if}
+		<input {name} class="field" class:field-with-icon={withIcon} {...props} />
+	</div>
+	{#if errors && errors.length > 0}
+		<span class="field-error">{errors[0]}</span>
 	{/if}
-	<input class="field" class:field-with-icon={withIcon} {...props} />
 </div>
 
 <style lang="scss">
-	.container {
+	.label {
+		@include text-lg;
+		display: block;
+		margin-bottom: 0.75rem;
+		color: $dark-100;
+		font-weight: 400;
+	}
+
+	.hide-label {
+		@include sr-only;
+	}
+
+	.field-container {
 		position: relative;
 	}
 
@@ -61,5 +87,11 @@
 		outline: 2px solid transparent;
 		outline-offset: 2px;
 		box-shadow: inset 0 0 0 2px $brand-100;
+	}
+
+	.field-error {
+		@include text-base;
+		margin-top: 0.625rem;
+		color: $error-100;
 	}
 </style>
