@@ -12,7 +12,9 @@
 </script>
 
 <button class="button {className}" class:button_dark={variant === 'dark'} {...props}>
-	{text}
+	<span class="button-text">
+		{text}
+	</span>
 	{#if withIcon}
 		<svelte:component this={Icon} class="button-icon" aria-hidden="true" />
 	{/if}
@@ -31,7 +33,8 @@
 		cursor: pointer;
 		border: 1.5px solid $light-100;
 		padding: 1.25rem 2rem;
-		width: 20.125rem;
+		width: 100%;
+		max-width: 20.125rem;
 	}
 
 	.button:focus-visible {
@@ -48,6 +51,12 @@
 
 	.button_dark:hover {
 		background-color: $dark-80;
+	}
+
+	.button-text {
+		overflow: hidden;
+		// text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	:global(.button-icon) {

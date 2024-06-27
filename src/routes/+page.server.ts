@@ -1,3 +1,4 @@
+import { PUBLIC_HOST } from '$env/static/public';
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import slugify from 'slugify';
@@ -28,22 +29,14 @@ export const load: PageServerLoad = async ({ locals: { safeGetSession } }) => {
 		redirect(303, '/login');
 	}
 
-	// const { data: profile } = await supabase
-	// 	.from('profiles')
-	// 	.select(`username, full_name, website, avatar_url`)
-	// 	.eq('id', session.user.id)
-	// 	.single();
-
 	return { session };
 };
 
 export const actions = {
-	create: async ({ request, locals: { safeGetSession } }) => {
+	create: async ({ request, locals: { safeGetSession, supabase } }) => {
 		const formData = Object.fromEntries(await request.formData());
 
 		const { ...rest } = formData;
-
-		console.log(formData);
 
 		const validationResult = linkSchema.safeParse(formData);
 
@@ -56,13 +49,39 @@ export const actions = {
 			});
 		}
 
+		const { url, slug } = validationResult.data;
+
 		const { session } = await safeGetSession();
 
-		return { message: 'Link created successfully!' };
+		if (!session) {
+			redirect(303, '/login');
+		}
 
-		return fail(500, {
-			rest,
-			message: 'There was an issue creating the link.'
-		});
+		const { data, error } = await supabase
+			.schema('link_shortener_svelte')
+			.from('links')
+			.insert({
+				url,
+				slug,
+				user: session.user.id
+			})
+			.select('slug')
+			.single();
+
+		if (error) {
+			if (error.code === '23505') {
+				return fail(400, {
+					rest,
+					message: 'This slug is already in use.'
+				});
+			}
+
+			return fail(400, {
+				rest,
+				message: error.message
+			});
+		}
+
+		return { url: `${PUBLIC_HOST}/${data.slug}`, message: 'Success! Copy your new URL above.' };
 	}
 };

@@ -1,19 +1,26 @@
 <script lang="ts">
 	import type { SubmitFunction } from '@sveltejs/kit';
+	import { PUBLIC_HOST } from '$env/static/public';
 
 	import TextInput from '$lib/components/inputs/TextInput.svelte';
 	import Button from '$lib/components/buttons/Button.svelte';
-	import { invalidateAll } from '$app/navigation';
 	import { debounce } from '$lib/utils/debounce';
 	import slugify from 'slugify';
 	import { applyAction, enhance } from '$app/forms';
+	import Alert from '$lib/components/alerts/Alert.svelte';
 
 	let { form } = $props();
 
 	let url = $state('');
-	let site = $state('mtmx.io');
+	let site = $state(PUBLIC_HOST);
 	let slug = $state('');
+	let shortLink = $state('');
 	let isSubmitting = $state(false);
+	let isComplete = $state(false);
+	let isError = $state(false);
+	let isSuccess = $state(false);
+	let errorMessage = $state('');
+	let successMessage = $state('');
 
 	type TextInputEvent = Event & {
 		currentTarget: EventTarget & HTMLInputElement;
@@ -32,19 +39,25 @@
 	};
 
 	const handleCreateLink: SubmitFunction = async () => {
+		isError = false;
+		isSuccess = false;
 		isSubmitting = true;
 
 		return async ({ result }) => {
-			console.log(result);
-
 			isSubmitting = false;
 
-			if (result.type === 'failure' && result.data?.message) {
-				console.log(result.data.message);
+			if (result.type === 'success' && result.data?.message) {
+				isSuccess = true;
+				successMessage = result.data?.url;
+				shortLink = result.data?.url;
+				isComplete = true;
+				url = '';
+				slug = '';
 			}
 
-			if (result.type === 'success') {
-				await invalidateAll();
+			if (result.type === 'failure' && result.data?.message) {
+				isError = true;
+				errorMessage = result.data?.message;
 			}
 
 			await applyAction(result);
@@ -70,7 +83,7 @@
 					name="url"
 					withIcon={true}
 					withLabel={false}
-					value={form?.rest?.url ?? url}
+					value={url}
 					oninput={(e: TextInputEvent) => (url = e.currentTarget.value)}
 					errors={form?.fieldErrors?.url}
 				/>
@@ -89,16 +102,27 @@
 					type="text"
 					name="slug"
 					placeholder="slug (optional)"
-					value={form?.rest?.slug ?? slug}
+					value={slug}
 					oninput={(e: TextInputEvent) => handleSlugifyInput(e.currentTarget.value)}
 					errors={form?.fieldErrors?.slug}
 				/>
 			</div>
-			<Button text="Shorten Link" withIcon={true} type="submit" className="form-button" />
+			<Button
+				text={isSubmitting ? 'Creating...' : 'Shorten Link'}
+				disabled={isSubmitting}
+				withIcon={true}
+				type="submit"
+				className="form-button"
+			/>
 		</form>
+		{#if isSuccess}
+			<Alert variant="success" message={successMessage} copyText={shortLink} withCopy={true} />
+		{/if}
+		{#if isError}
+			<Alert variant="error" message={errorMessage} />
+		{/if}
 	</div>
 </section>
-v
 
 <style lang="scss">
 	section {
@@ -135,12 +159,12 @@ v
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		margin-bottom: 3rem;
 	}
 
 	.fields-container {
 		display: flex;
 		flex-wrap: wrap;
-		align-items: center;
 		gap: 1.25rem 1.5rem;
 		margin-top: 3rem;
 	}
@@ -158,6 +182,9 @@ v
 
 	.slash {
 		@include headline-lg;
+		display: flex;
+		align-items: center;
+		height: 4.5rem;
 		color: $dark-100;
 		font-weight: 400;
 	}

@@ -12,7 +12,7 @@
 	} = $props();
 </script>
 
-<div class="input-container {className}">
+<div class={className}>
 	<label for={name} class="label" class:hide-label={!hideLabel}>Email</label>
 	<div class="field-container">
 		{#if withIcon}
@@ -23,7 +23,7 @@
 		<input {name} class="field" class:field-with-icon={withIcon} {...props} />
 	</div>
 	{#if errors && errors.length > 0}
-		<span class="field-error">{errors[0]}</span>
+		<p class="field-error">{errors[0]}</p>
 	{/if}
 </div>
 
