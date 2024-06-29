@@ -2,6 +2,7 @@
 	import '../app.scss';
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import Seo from '$lib/components/seo/Seo.svelte';
 
 	export let data;
 
@@ -19,6 +20,7 @@
 	});
 </script>
 
+<Seo />
 <main>
 	<slot />
 </main>

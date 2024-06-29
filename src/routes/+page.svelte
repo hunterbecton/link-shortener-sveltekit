@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { SubmitFunction } from '@sveltejs/kit';
-	import { PUBLIC_HOST } from '$env/static/public';
+	import { PUBLIC_ORIGIN } from '$env/static/public';
 
-	import TextInput from '$lib/components/inputs/TextInput.svelte';
-	import Button from '$lib/components/buttons/Button.svelte';
+	import HomeTextInput from '$lib/components/inputs/home/HomeTextInput.svelte';
+	import HomeButton from '$lib/components/buttons/home/HomeButton.svelte';
 	import { debounce } from '$lib/utils/debounce';
 	import slugify from 'slugify';
 	import { applyAction, enhance } from '$app/forms';
@@ -12,7 +12,7 @@
 	let { form } = $props();
 
 	let url = $state('');
-	let site = $state(PUBLIC_HOST);
+	let site = $state(PUBLIC_ORIGIN);
 	let slug = $state('');
 	let shortLink = $state('');
 	let isSubmitting = $state(false);
@@ -70,14 +70,15 @@
 		<header>
 			<h1>The best <span>link shortener</span></h1>
 			<p>
-				Simply paste your link, choose a custom slug, and share. Perfect for making your URLs short
-				and memorable.
+				Simply paste your link, choose a custom slug, and share. <span class="header-break"
+					>Perfect for making your URLs short and memorable.</span
+				>
 			</p>
 		</header>
 		<form method="POST" action="?/create" use:enhance={handleCreateLink}>
 			<div class="fields-container">
-				<TextInput
-					className="url"
+				<HomeTextInput
+					className="field-url"
 					type="url"
 					placeholder="Paste your URL"
 					name="url"
@@ -85,34 +86,34 @@
 					withLabel={false}
 					value={url}
 					oninput={(e: TextInputEvent) => (url = e.currentTarget.value)}
-					errors={form?.fieldErrors?.url}
+					errors={form?.fieldErrors?.url ?? []}
 				/>
-				<TextInput
+				<HomeTextInput
 					withLabel={false}
 					name="site"
 					type="text"
-					className="site"
+					className="field-site"
 					disabled={true}
 					value={site}
 				/>
-				<span class="slash">/</span>
-				<TextInput
+				<span class="field-slash">/</span>
+				<HomeTextInput
 					withLabel={false}
-					className="slug"
+					className="field-slug"
 					type="text"
 					name="slug"
 					placeholder="slug (optional)"
 					value={slug}
 					oninput={(e: TextInputEvent) => handleSlugifyInput(e.currentTarget.value)}
-					errors={form?.fieldErrors?.slug}
+					errors={form?.fieldErrors?.slug ?? []}
 				/>
 			</div>
-			<Button
+			<HomeButton
 				text={isSubmitting ? 'Creating...' : 'Shorten Link'}
 				disabled={isSubmitting}
 				withIcon={true}
 				type="submit"
-				className="form-button"
+				className="link-form-button"
 			/>
 		</form>
 		{#if isSuccess}
@@ -126,7 +127,11 @@
 
 <style lang="scss">
 	section {
-		padding: 10rem 2rem 2rem;
+		padding: 6rem 1rem 1rem;
+
+		@include sm {
+			padding: 10rem 2rem 2rem;
+		}
 	}
 
 	.container {
@@ -140,56 +145,107 @@
 	}
 
 	h1 {
-		@include headline-4xl;
+		@include headline-2xl;
 		font-weight: 400;
+
+		@include md {
+			@include headline-3xl;
+		}
+
+		@include lg {
+			@include headline-4xl;
+		}
+
+		span {
+			display: block;
+			color: $brand-100;
+
+			@include sm {
+				display: inline;
+			}
+		}
 	}
 
-	h1 span {
-		color: $brand-100;
+	.header-break {
+		display: none;
+
+		@include sm {
+			display: inline;
+		}
 	}
 
 	p {
-		@include headline-base;
-		margin: 1.25rem auto 0;
+		@include text-base;
+		margin: 0.75rem auto 0;
 		max-width: 42.875rem;
 		font-weight: 400;
+
+		@include md {
+			@include text-lg;
+			margin: 1rem auto 0;
+		}
+
+		@include lg {
+			@include headline-base;
+			margin: 1.25rem auto 0;
+		}
 	}
 
 	form {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		margin-bottom: 3rem;
+		margin: 2rem auto;
+		max-width: 44.1875rem;
+
+		@include md {
+			margin: 3rem auto;
+		}
 	}
 
 	.fields-container {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 1.25rem 1.5rem;
-		margin-top: 3rem;
+		gap: 1rem 1.25rem;
+
+		@include md {
+			gap: 1.25rem 1.5rem;
+		}
 	}
 
-	:global(.url) {
+	:global(.field-url) {
 		flex: 0 1 auto;
 		width: 100%;
 	}
 
-	:global(.site),
-	:global(.slug) {
-		flex: 1 1 0%;
+	:global(.field-site),
+	:global(.field-slug) {
+		flex: 0 1 auto;
 		width: 100%;
+
+		@include sm {
+			flex: 1 1 0%;
+		}
 	}
 
-	.slash {
+	.field-slash {
 		@include headline-lg;
-		display: flex;
+		display: none;
 		align-items: center;
 		height: 4.5rem;
 		color: $dark-100;
 		font-weight: 400;
+
+		@include sm {
+			display: flex;
+		}
 	}
 
-	:global(.form-button) {
-		margin: 3rem auto 0;
+	:global(.link-form-button) {
+		margin: 2rem auto 0;
+
+		@include sm {
+			margin: 3rem auto 0;
+		}
 	}
 </style>

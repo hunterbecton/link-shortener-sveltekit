@@ -27,6 +27,7 @@
 	class="alert {className}"
 	class:alert_success={variant === 'success'}
 	class:alert_error={variant === 'error'}
+	class:alert_with_icon={withCopy}
 >
 	<span class="alert-text">{message}</span>
 	{#if withCopy}
@@ -47,6 +48,11 @@
 		padding: 0.625rem 1.25rem;
 		width: 100%;
 		max-width: 44.1875rem;
+		text-align: center;
+	}
+
+	.alert_with_icon {
+		text-align: left;
 	}
 
 	.alert_success {

@@ -1,4 +1,4 @@
-import { PUBLIC_HOST } from '$env/static/public';
+import { PUBLIC_ORIGIN } from '$env/static/public';
 import { fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import slugify from 'slugify';
@@ -82,6 +82,6 @@ export const actions = {
 			});
 		}
 
-		return { url: `${PUBLIC_HOST}/${data.slug}`, message: 'Success! Copy your new URL above.' };
+		return { url: `${PUBLIC_ORIGIN}/${data.slug}`, message: 'Success! Copy your new URL above.' };
 	}
 };
